@@ -1,0 +1,119 @@
+.container {
+    --antd-wave-shadow-color:white;
+    background-image: linear-gradient(to bottom right, #b7eb8f, #73d13d, #87e8de);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: center;
+
+    .login-container {
+        display: block;
+        width: 40em;
+        height: 20em;
+        margin: 0 auto;
+        border-radius: 15px;
+        box-shadow: 0 10px 50px 0px #135200;
+        background-color: #389e0d;
+
+        .left-container {
+            display: inline-block;
+            width: 30em;
+            height: 20em;
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+            padding: 10%;
+            background-image: linear-gradient(to bottom right, #237804, #006d75);
+        }
+
+        .right-container {
+            vertical-align: top;
+            height: 20em;
+            width: 10em;
+            display: inline-block;
+            padding: 3em 0;
+        }
+
+        .title {
+            color: white;
+            font-weight: 500;
+            font-size: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        a {
+            color: white;
+            display: block;
+            margin-top: 1.4em;
+        }
+
+        Input {
+            padding-left: 0;
+            display: block;
+            margin-bottom: 1em;
+            background: none;
+            border: none;
+            border-bottom: 1px solid white;
+            border-radius: 0;
+            color: white;
+        }
+
+        Input:focus {
+            box-shadow: none;
+        }
+
+        Button {
+            width: 4em;
+            height: 4em;
+            border-radius: 2em;
+            border-width: 0.2em;
+            padding: 0;
+            background: none;
+            font-weight: 500;
+            color: white;
+            margin: 0 auto;
+            display: block;
+        }
+
+        Button:hover,
+        Button:focus {
+            color: #52c41a;
+            border-color: #f0f0f0;
+            background-color: #f0f0f0;
+        }
+
+        .login {
+            margin-top: 6em;
+        }
+
+        .displayHandler {
+            animation: show 0.5s ease forwards;
+        }
+
+        .noneHandler {
+            animation: hide 0.5s ease forwards;
+            display: none;
+        }
+    }
+}
+
+@keyframes show {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes hide {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
