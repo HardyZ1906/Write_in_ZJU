@@ -19,7 +19,7 @@ function Login() {
         let f = new FormData();
         f.append("username", userName);
         f.append("password", psw);
-        axios.post("http://124.214.241.122:8000/login", f).then(res => {
+        axios.post("http://10.214.241.122:8000/login", f).then(res => {
             switch(res) {
                 case "200": message.success("登录成功"); break;
                 case "404": message.error("用户名或密码错误"); break;
@@ -37,7 +37,7 @@ function Login() {
         let f = new FormData();
         f.append("username", userName);
         f.append("password", psw);
-        axios.post("http://124.214.241.122:8000/register", f).then(res => {
+        axios.post("http://10.214.241.122:8000/login", f).then(res => {
             switch (res) {
                 case "200": message.success("注册成功"); break;
                 case "404": message.error("用户名重复"); break;
