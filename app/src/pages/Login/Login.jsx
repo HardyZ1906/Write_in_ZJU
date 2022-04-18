@@ -20,9 +20,10 @@ function Login() {
         f.append("username", userName);
         f.append("password", psw);
         axios.post("http://10.214.241.122:8000/login", f).then(res => {
-            switch(res) {
-                case "200": message.success("登录成功"); break;
-                case "404": message.error("用户名或密码错误"); break;
+            console.log(res.data);
+            switch(res.data) {
+                case 200: message.success("登录成功"); break;
+                case 404: message.error("用户名或密码错误"); break;
                 default: message.error("登录失败");
             }
         });
@@ -38,7 +39,8 @@ function Login() {
         f.append("username", userName);
         f.append("password", psw);
         axios.post("http://10.214.241.122:8000/login", f).then(res => {
-            switch (res) {
+            console.log(res.data);
+            switch (res.data) {
                 case "200": message.success("注册成功"); break;
                 case "404": message.error("用户名重复"); break;
                 default: message.error("注册失败");
