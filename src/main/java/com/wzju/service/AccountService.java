@@ -181,6 +181,14 @@ public class AccountService {
         }
     }
 
+    public List<User> getAllUsers() {
+        System.out.println("getAllUsers...");
+
+        Query query = new Query();
+        query.fields().include("username").exclude("id");
+        return mongoTemplate.find(query, User.class);
+    }
+
     public AccountService() {
         tokenMap = new HashMap<>();
         cleanerThread = new TokenPoolCleanerThread(tokenMap);
