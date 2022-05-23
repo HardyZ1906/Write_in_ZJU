@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
-import org.apache.poi.xssf.usermodel.XSSFCell;
+// import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -66,12 +66,47 @@ public class ExcelService {
     @Autowired
     MongoTemplate mongoTemplate;
 
+    public String obtain(String username, String owner, String filename) {
+        String path = "./excelfiles/" + owner + "/" + filename + ".xls";
+        System.out.println("obtain: " + username + ", " + path);
+        EditorRecord editorRecord = editorMap.get(path);
+        if (editorRecord == null) {
+            editorMap.put(path, new EditorRecord(username, new Date()));
+            return null;
+        } else if (editorRecord.editor.equals(username)) {
+            editorRecord.lastSession = new Date();
+            return null;
+        } else {
+            return editorRecord.editor;
+        }
+    }
+
+    public void quitEditting(String username) {
+        System.out.println("quitEditting: " + username);
+        for (Iterator<Map.Entry<String, EditorRecord>> it = editorMap.entrySet().iterator(); it.hasNext();) {
+            String editor = it.next().getValue().editor;
+            if (editor != null &&  editor.equals(username)) {
+                it.remove();
+            }
+        }
+    }
+
     public void createUserDir(String username) {
-        File path = new File("./excelfiles/" + username + "/");
+        File wd = new File(System.getProperty("user.dir"));
+        System.out.println("Current working directory is: " + wd);
+        String pathname = "./excelfiles/" + username + "/";
+        System.out.println("createUserDir: " + pathname);
+        File path = new File(pathname);
         path.mkdirs();
     }
 
+    public void createExcelFile(String owner, String filename) throws IOException {
+        String path = "./excelfiles/" + owner + "/" + filename + ".xls";
+        createExcelFile(path);
+    }
+
     public void createExcelFile(String path) throws IOException {
+        System.out.println("createExcelFile: " + path);
         FileOutputStream fos = new FileOutputStream(path);
         XSSFWorkbook xwb = new XSSFWorkbook();
         xwb.write(fos); xwb.close(); fos.close();
@@ -79,20 +114,57 @@ public class ExcelService {
 
     public byte[] getExcelFile(String owner, String filename) throws IOException {
         String path = "./excelfiles/" + owner + "/" + filename + ".xls";
-        if (fileMutexMap.get(path) == null) {
-            fileMutexMap.put(path, new ReentrantLock());
-        }
         return getExcelFile(path);
     }
 
     public byte[] getExcelFile(String path) throws IOException {
-        FileInputStream fis = new FileInputStream(path);
+        System.out.println("getExcelFile: " + path);
+        if (fileMutexMap.get(path) == null) {
+            fileMutexMap.put(path, new ReentrantLock());
+        }
         Lock mutex = fileMutexMap.get(path);
         mutex.lock();
+        FileInputStream fis = new FileInputStream(path);
         byte[] data = fis.readAllBytes();
         mutex.unlock();
         fis.close();
         return data;
+    }
+
+    public void saveExcelFile(String owner, String filename, String content) throws IOException {
+        String path = "./excelfiles/" + owner + "/" + filename + ".xls";
+        saveExcelFile(path, content);
+    }
+
+    public void saveExcelFile(String path, String content) throws IOException {
+        System.out.println("saveExcelFile: " + path);
+        if (fileMutexMap.get(path) == null) {
+            fileMutexMap.put(path, new ReentrantLock());
+        }
+        Lock mutex = fileMutexMap.get(path);
+        mutex.lock();
+        FileOutputStream fos = new FileOutputStream(path);
+        fos.write(content.getBytes());
+        mutex.unlock();
+        fos.close();
+    }
+
+    public void dropExcelFile(String owner, String filename) throws IOException {
+        String path = "./excelfiles/" + owner + "/" + filename + ".xls";
+        dropExcelFile(path);
+    }
+
+    public void dropExcelFile(String path) throws IOException {
+        if (fileMutexMap.get(path) == null) {
+            fileMutexMap.put(path, new ReentrantLock());
+        }
+        Lock mutex = fileMutexMap.get(path);
+        mutex.lock();
+        File f = new File(path);
+        f.delete();
+        fileMutexMap.remove(path);
+        editorMap.remove(path);
+        mutex.unlock();
     }
 
     // public String switchToCell(String username, String owner, String filename,

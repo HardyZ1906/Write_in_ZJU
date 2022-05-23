@@ -12,19 +12,19 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class User {
     
     @Id
-    private String id;
+    public String id;
     
     @Field("username")
-    private String username;
+    public String username;
 
     @Field("password")
-    private String password;
+    public String password;
 
     @Field("createdDocs")
-    private Set<String> createdDocs;
+    public Set<String> createdDocs;
 
     @Field("joinedDocs")
-    private Set<String> joinedDocs;
+    public Set<String> joinedDocs;
 
     public String getId() {
         return id;
