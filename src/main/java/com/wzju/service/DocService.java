@@ -1,5 +1,7 @@
 package com.wzju.service;
 
+import java.io.IOException;
+
 import com.wzju.model.Doc;
 import com.wzju.model.User;
 
@@ -17,6 +19,9 @@ public class DocService {
     @Autowired
     MongoTemplate mongoTemplate;
 
+    @Autowired
+    ExcelService excelService;
+
     public int createDoc(String username, String filename, int type, String[] collaborators) {
         System.out.println("createDoc: " + username + ", " + filename + ", " + type);
 
@@ -24,12 +29,26 @@ public class DocService {
         User user;
         Doc doc;
 
+        try {
+            switch (type) {
+            case 0:
+                // TODO: create a .txt file
+                break;
+            case 1:
+                excelService.createExcelFile("./excelfiles/" + username + "/" + filename + ".xls");
+                break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+
         doc = new Doc(filename, type, username, collaborators);
         try {
             mongoTemplate.insert(doc, "doc");
         } catch (DuplicateKeyException e) {
             System.out.println("...  failed");
-            return -1;
+            return -2;
         }
 
         query = new Query(Criteria.where("username").is(username));

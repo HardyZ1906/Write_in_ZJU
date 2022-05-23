@@ -1,6 +1,7 @@
 package com.wzju.controller.account;
 
 import com.wzju.service.AccountService;
+import com.wzju.service.ExcelService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,6 +31,9 @@ public class LoginController {
     @Autowired
     AccountService accountService;
 
+    @Autowired
+    ExcelService excelService;
+
     @RequestMapping("/login")
     @CrossOrigin
     public LoginResponse login(String username, String password) {
@@ -45,6 +49,7 @@ public class LoginController {
     @CrossOrigin
     public RegisterResponse register(String username, String password) {
         if (accountService.register(username, password)) {
+            excelService.createUserDir(username);
             return new RegisterResponse("200");
         } else {
             return new RegisterResponse("404");
