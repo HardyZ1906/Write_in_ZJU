@@ -1,6 +1,8 @@
 package com.wzju.service;
 
 import org.springframework.stereotype.Service;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.IOException;
@@ -75,6 +77,14 @@ public class ScheduleService {
             return infos;
         } else
             return new HashMap<>();
+    }
+
+    public JSONObject toJson(Map<String, String> otOutput) {
+        jsonObject = new JSONObject();
+        for (Map.Entry<String, String> oentry : otOutput.entrySet()) {
+            jsonObject.put(oentry.getKey(), oentry.getValue());
+        }
+        return jsonObject;
     }
 
     class ConsumeThread extends Thread {
