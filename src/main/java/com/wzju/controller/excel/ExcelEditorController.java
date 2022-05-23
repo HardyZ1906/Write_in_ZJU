@@ -6,6 +6,7 @@ import com.wzju.service.AccountService;
 import com.wzju.service.ExcelService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,6 +48,7 @@ public class ExcelEditorController {
     ExcelService excelService;
 
     @RequestMapping("/getExcelFile")
+    @CrossOrigin
     public GetExcelFileResponse getExcelFile(String token, String owner, String filename) {
         String username = accountService.validate(token);
         if (username == null) {
@@ -63,6 +65,7 @@ public class ExcelEditorController {
     }
 
     @RequestMapping("/writeToCell")
+    @CrossOrigin
     public WriteToCellResponse writeToCell(String token, String owner, String filename,
             int sheet, int row, int col, String content) {
         String username = accountService.validate(token);
@@ -81,6 +84,7 @@ public class ExcelEditorController {
     }
 
     @RequestMapping("/switchToCell")
+    @CrossOrigin
     public SwitchToCellResponse switchToCell(String token, String owner, String filename,
             int srcSheet, int srcRow, int srcCol, int destSheet, int destRow, int destCol) {
         String username = accountService.validate(token);

@@ -35,7 +35,11 @@ class TokenPoolCleanerThread extends Thread {
             try {
                 sleep(1_000_000);  // cleans up token pool every 1000 seconds
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+                System.out.println("TokenPoolCleanerThread interrupted.");
             }
 
             for (Iterator<Map.Entry<String, TokenRec>> it = tokenMap.entrySet().iterator(); it.hasNext();) {

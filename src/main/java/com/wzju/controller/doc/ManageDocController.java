@@ -4,6 +4,7 @@ import com.wzju.service.AccountService;
 import com.wzju.service.DocService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,6 +42,7 @@ public class ManageDocController {
     DocService docService;
 
     @RequestMapping("/createDoc")
+    @CrossOrigin
     public CreateDocResponse createDoc(String token, String filename, int type, String[] collaborators) {
         String username = accountService.validate(token);
 
@@ -54,6 +56,7 @@ public class ManageDocController {
     }
 
     @RequestMapping("/changeCollaborators")
+    @CrossOrigin
     public ChangeCollaboratorsResponse changeCollaborators(String token, String filename, int type,
         String[] toAdd, String[] toDrop) {
         String username = accountService.validate(token);
@@ -68,6 +71,7 @@ public class ManageDocController {
     }
 
     @RequestMapping("/dropDoc")
+    @CrossOrigin
     public DropDocResponse dropDoc(String token, String filename, int type) {
         String username = accountService.validate(token);
 

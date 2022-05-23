@@ -27,7 +27,19 @@ class EditorCleanerThread extends Thread {
     @Override
     public void run() {
         for (;;) {
-            
+            try {
+                sleep(100_000);  // cleans up editor info every 100 seconds
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+                System.out.println("EditorCleanerThread interrupted.");
+            }
+
+            for (Map.Entry<String, EditorRecord> entry: EditorMap.entrySet()) {
+                
+            }
         }
     }
 }

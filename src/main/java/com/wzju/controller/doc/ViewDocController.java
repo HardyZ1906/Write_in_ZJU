@@ -7,6 +7,7 @@ import com.wzju.service.AccountService;
 import com.wzju.service.DocService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,6 +41,7 @@ public class ViewDocController {
     DocService docService;
 
     @RequestMapping("/getCreatedDocs")
+    @CrossOrigin
     public GetCreatedDocsResponse getCreatedDocs(String token) {
         String username = accountService.validate(token);
         if (username == null) {
@@ -50,6 +52,7 @@ public class ViewDocController {
     }
 
     @RequestMapping("/getJoinedDocs")
+    @CrossOrigin
     public GetJoinedDocsResponse getJoinedDocs(String token) {
         String username = accountService.validate(token);
         if (username == null) {
