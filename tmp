@@ -1,0 +1,22 @@
+abcba
+retain 1
+insert d
+retain 4
+end
+delete 1
+retain 3
+insert s
+retain 1
+end
+
+abcba
+retain 1
+insert d
+retain 4
+end
+delete 1
+retain 1
+retain 3
+insert s
+retain 1
+end
