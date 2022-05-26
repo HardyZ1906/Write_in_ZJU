@@ -1,7 +1,6 @@
 package com.wzju.rabbitmq.producer;
 
 import com.wzju.rabbitmq.entity.Produceentity;
-import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -13,10 +12,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import com.wzju.rabbitmq.connection.ConnectionUtil;
 
-@Component
 public class RabbitmqProducer {
     Channel channel = null;
-    Connection connection = null;
+    static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
     public String filename;
 
     public RabbitmqProducer() {
@@ -28,8 +26,6 @@ public class RabbitmqProducer {
 
     @PostConstruct
     void init() throws Exception {
-        // 获取连接
-        Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
         // 从连接中获取一个通道
         channel = connection.createChannel();
         channel.queueDeclare(filename, true, false, true, null);
