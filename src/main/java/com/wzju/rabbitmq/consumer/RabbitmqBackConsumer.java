@@ -1,7 +1,8 @@
 package com.wzju.rabbitmq.consumer;
 
 import com.rabbitmq.client.Channel;
-import org.springframework.stereotype.Component;
+
+import com.rabbitmq.client.Connection;
 import com.wzju.rabbitmq.connection.ConnectionUtil;
 import com.rabbitmq.client.*;
 import java.io.IOException;
@@ -12,10 +13,9 @@ import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-@Component
 public class RabbitmqBackConsumer {
     Channel channel = null;
-    Connection connection = null;
+    static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
     public final String filename;
     public final String usrname;
     public String queueName;
@@ -28,8 +28,6 @@ public class RabbitmqBackConsumer {
 
     @PostConstruct
     void init() throws Exception {
-        // 获取连接
-        Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
         // 从连接中获取一个通道
         channel = connection.createChannel();
         this.queueName = channel.queueDeclare().getQueue();
