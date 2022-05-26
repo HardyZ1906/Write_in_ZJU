@@ -59,7 +59,7 @@ public class DocService {
 
         for (String collaborator: collaborators) {
             query = new Query(Criteria.where("username").is(collaborator));
-            if ((user = mongoTemplate.findOne(query, User.class)) != null) {
+            if ((user = mongoTemplate.findOne(query, User.class)) != null && !user.username.equals(username)) {
                 user.addJoinedDoc(doc.getId());
                 mongoTemplate.save(user);
             }
@@ -89,7 +89,7 @@ public class DocService {
         } else {
             for (String username: toAdd) {
                 query = new Query(Criteria.where("username").is(username));
-                if ((user = mongoTemplate.findOne(query, User.class)) != null) {
+                if ((user = mongoTemplate.findOne(query, User.class)) != null && !user.username.equals(doc.owner)) {
                     user.addJoinedDoc(doc.getId());
                     mongoTemplate.save(user);
                 }

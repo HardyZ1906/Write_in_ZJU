@@ -80,7 +80,7 @@ public class ScheduleService {
     }
 
     public JSONObject toJson(Map<String, String> otOutput) {
-        jsonObject = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
         for (Map.Entry<String, String> oentry : otOutput.entrySet()) {
             jsonObject.put(oentry.getKey(), oentry.getValue());
         }

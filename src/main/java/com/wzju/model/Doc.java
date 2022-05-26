@@ -13,28 +13,28 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Doc {
     
     @Id
-    private String id;
+    public String id;
     
     @Field("filename")
-    private String filename;
+    public String filename;
 
     @Field("type")
-    private int type;
+    public int type;
 
     @Field("owner")
-    private String owner;
+    public String owner;
 
     @Field("dateCreated")
-    private Date dateCreated;
+    public Date dateCreated;
 
     @Field("collaborators")
-    private Set<String> collaborators;
+    public Set<String> collaborators;
 
     @Field("dateLastEdited")
-    private Date dateLastEdited;
+    public Date dateLastEdited;
 
     @Field("lastEditor")
-    private String lastEditor;
+    public String lastEditor;
 
     public String getId() {
         return id;

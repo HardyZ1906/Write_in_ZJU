@@ -1,9 +1,13 @@
 package com.wzju.controller.doc;
 
+import java.io.IOException;
+
 import com.wzju.service.AccountService;
 import com.wzju.service.DocService;
+import com.wzju.service.ExcelService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +44,11 @@ public class ManageDocController {
     @Autowired
     DocService docService;
 
+    @Autowired
+    ExcelService excelService;
+
     @RequestMapping("/createDoc")
+    @CrossOrigin
     public CreateDocResponse createDoc(String token, String filename, int type, String[] collaborators) {
         String username = accountService.validate(token);
 
@@ -49,11 +57,20 @@ public class ManageDocController {
         } else if (docService.createDoc(username, filename, type, collaborators) < 0) {
             return new CreateDocResponse("404");
         } else {
+            if (type == 1) {
+                try {
+                    excelService.createExcelFile(username, filename);
+                } catch (IOException e) {
+                    System.out.println("Failed to create excel file for " + username + ":" + filename);
+                    e.printStackTrace();
+                }
+            }
             return new CreateDocResponse("200");
         }
     }
 
     @RequestMapping("/changeCollaborators")
+    @CrossOrigin
     public ChangeCollaboratorsResponse changeCollaborators(String token, String filename, int type,
         String[] toAdd, String[] toDrop) {
         String username = accountService.validate(token);
@@ -68,6 +85,7 @@ public class ManageDocController {
     }
 
     @RequestMapping("/dropDoc")
+    @CrossOrigin
     public DropDocResponse dropDoc(String token, String filename, int type) {
         String username = accountService.validate(token);
 
