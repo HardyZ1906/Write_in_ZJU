@@ -1,7 +1,6 @@
 package com.wzju.rabbitmq.producer;
 
 import com.wzju.rabbitmq.entity.Produceentity;
-import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -14,7 +13,6 @@ import java.util.concurrent.TimeoutException;
 import com.wzju.rabbitmq.connection.ConnectionUtil;
 import java.util.HashSet;
 
-@Component
 public class RabbitmqBackProducer {
     Channel channel = null;
     static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
