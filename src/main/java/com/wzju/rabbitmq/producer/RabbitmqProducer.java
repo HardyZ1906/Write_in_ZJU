@@ -14,7 +14,14 @@ import com.wzju.rabbitmq.connection.ConnectionUtil;
 
 public class RabbitmqProducer {
     Channel channel = null;
-    static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+    static Connection connection;
+    static {
+        try {
+            connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public String filename;
 
     public RabbitmqProducer() {

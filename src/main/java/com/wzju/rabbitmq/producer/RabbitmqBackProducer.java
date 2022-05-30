@@ -15,7 +15,14 @@ import java.util.HashSet;
 
 public class RabbitmqBackProducer {
     Channel channel = null;
-    static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+    static Connection connection;
+    static {
+        try {
+            connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public final String filename;
 
     public RabbitmqBackProducer(String fn) {

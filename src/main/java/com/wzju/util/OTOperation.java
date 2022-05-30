@@ -1,6 +1,8 @@
 package com.wzju.util;
 
-public class OTOperation {
+import java.io.Serializable;
+
+public class OTOperation implements Serializable {
     final static int RETAIN = 0, INSERT = 1, DELETE = 2;
     int type;
 

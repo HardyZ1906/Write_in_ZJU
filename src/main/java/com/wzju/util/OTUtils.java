@@ -1,7 +1,11 @@
 package com.wzju.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import java.util.ArrayList;
 
 // retain: Int(0), Int(num); insert: Int(1), UTF(str); delete: Int(2), Int(num)
 public class OTUtils {
@@ -23,7 +27,7 @@ public class OTUtils {
         }
     }
 
-    private static void append(ArrayList<OTOperation> op, OTOperation o) {
+    private static void appendOp(ArrayList<OTOperation> op, OTOperation o) {
         if (op.isEmpty()) {
             op.add(o);
         } else {
@@ -120,13 +124,13 @@ public class OTUtils {
             if (o1 != null && o1.type == OTOperation.INSERT) {
                 int insertLength = ((OTInsert)o1).content.length();
                 op1t.add(o1);
-                append(op2t, new OTRetain(insertLength));
+                appendOp(op2t, new OTRetain(insertLength));
                 o1 = i1.nextOP();
                 continue;
             } else if (o2 != null && o2.type == OTOperation.INSERT) {
                 int insertLength = ((OTInsert)o2).content.length();
                 op2t.add(o2);
-                append(op1t, new OTRetain(insertLength));
+                appendOp(op1t, new OTRetain(insertLength));
                 o2 = i2.nextOP();
                 continue;
             }
@@ -158,8 +162,8 @@ public class OTUtils {
                         o1 = new OTRetain(retain1.length - retain2.length);
                     }
 
-                    append(op1t, new OTRetain(minLength));
-                    append(op2t, new OTRetain(minLength));
+                    appendOp(op1t, new OTRetain(minLength));
+                    appendOp(op2t, new OTRetain(minLength));
                     
                     break;
                 }
@@ -183,7 +187,7 @@ public class OTUtils {
                         o1 = new OTRetain(retain1.length - delete2.length);
                     }
 
-                    append(op2t, new OTDelete(minLength));
+                    appendOp(op2t, new OTDelete(minLength));
 
                     break;
                 }
@@ -207,7 +211,7 @@ public class OTUtils {
                         o1 = new OTDelete(delete1.length - retain2.length);
                     }
 
-                    append(op1t, new OTDelete(minLength));
+                    appendOp(op1t, new OTDelete(minLength));
 
                     break;
                 }
@@ -234,10 +238,15 @@ public class OTUtils {
 
         OTOperation[][] ot = new OTOperation[2][];
         
-        ot[0] = op1t.toArray(new OTOperation[op1t.size()]);
-        ot[1] = op2t.toArray(new OTOperation[op2t.size()]);
+        ot[0] = op2t.toArray(new OTOperation[op2t.size()]);
+        ot[1] = op1t.toArray(new OTOperation[op1t.size()]);
         
         return ot;
+    }
+
+    public static OTOperation[][] transform(OTOperation[][] ops) {
+        
+        return null;
     }
 
     public static OTOperation[] compose(OTOperation[] op1, OTOperation[] op2) throws OTException {
@@ -251,13 +260,13 @@ public class OTUtils {
             }
 
             if (o1 != null && o1.type == OTOperation.DELETE) {
-                append(op, new OTDelete(((OTDelete)o1).length));
+                appendOp(op, new OTDelete(((OTDelete)o1).length));
                 o1 = i1.nextOP();
                 continue;
             }
 
             if (o2 != null && o2.type == OTOperation.INSERT) {
-                append(op, new OTInsert(((OTInsert)o2).content));
+                appendOp(op, new OTInsert(((OTInsert)o2).content));
                 o2 = i2.nextOP();
                 continue;
             }
@@ -274,15 +283,15 @@ public class OTUtils {
                     OTRetain retain2 = (OTRetain)o2;
 
                     if (retain1.length == retain2.length) {
-                        append(op, new OTRetain(retain1.length));
+                        appendOp(op, new OTRetain(retain1.length));
                         o1 = i1.nextOP();
                         o2 = i2.nextOP();
                     } else if (retain1.length < retain2.length) {
-                        append(op, new OTRetain(retain1.length));
+                        appendOp(op, new OTRetain(retain1.length));
                         o1 = i1.nextOP();
                         o2 = new OTRetain(retain2.length - retain1.length);
                     } else {  // retain1.length > retain2.length
-                        append(op, new OTRetain(retain2.length));
+                        appendOp(op, new OTRetain(retain2.length));
                         o2 = i2.nextOP();
                         o1 = new OTRetain(retain1.length - retain2.length);
                     }
@@ -295,15 +304,15 @@ public class OTUtils {
                     OTDelete delete2 = (OTDelete)o2;
 
                     if (retain1.length == delete2.length) {
-                        append(op, new OTDelete(retain1.length));
+                        appendOp(op, new OTDelete(retain1.length));
                         o1 = i1.nextOP();
                         o2 = i2.nextOP();
                     } else if (retain1.length < delete2.length) {
-                        append(op, new OTDelete(retain1.length));
+                        appendOp(op, new OTDelete(retain1.length));
                         o1 = i1.nextOP();
                         o2 = new OTDelete(delete2.length - retain1.length);
                     } else {  // retain1.length < delete2.length
-                        append(op, new OTDelete(delete2.length));
+                        appendOp(op, new OTDelete(delete2.length));
                         o2 = i2.nextOP();
                         o1 = new OTRetain(retain1.length - delete2.length);
                     }
@@ -317,15 +326,15 @@ public class OTUtils {
                     int insertLength = insert1.content.length();
 
                     if (insertLength == retain2.length) {
-                        append(op, new OTInsert(insert1.content));
+                        appendOp(op, new OTInsert(insert1.content));
                         o1 = i1.nextOP();
                         o2 = i2.nextOP();
                     } else if (insertLength < retain2.length) {
-                        append(op, new OTInsert(insert1.content));
+                        appendOp(op, new OTInsert(insert1.content));
                         o1 = i1.nextOP();
                         o2 = new OTRetain(retain2.length - insertLength);
                     } else {  // insertLength > retain2.length
-                        append(op, new OTInsert(insert1.content.substring(0, retain2.length)));
+                        appendOp(op, new OTInsert(insert1.content.substring(0, retain2.length)));
                         o2 = i2.nextOP();
                         o1 = new OTInsert(insert1.content.substring(retain2.length));
                     }
@@ -357,162 +366,162 @@ public class OTUtils {
         return op.toArray(new OTOperation[op.size()]);
     }
 
-    private static OTOperation[] readOp(Scanner in) {             
-        ArrayList<OTOperation> op = new ArrayList<>();
+    // private static OTOperation[] readOp(Scanner in) {             
+    //     ArrayList<OTOperation> op = new ArrayList<>();
 
-        boolean loop = true;
-        while (loop) {
-            System.out.println("Please enter the next operation: ");
-            String o = in.next();
-            switch (o.toLowerCase()) {
-                case "retain": {
-                    append(op, new OTRetain(in.nextInt()));
-                    break;
-                }                    
-                case "insert": {
-                    append(op, new OTInsert(in.next()));
-                    break;
-                }
-                case "delete": {
-                    append(op, new OTDelete(in.nextInt()));
-                    break;
-                } 
-                default: {
-                    loop = false;
-                }
-            }
-        }
+    //     boolean loop = true;
+    //     while (loop) {
+    //         System.out.println("Please enter the next operation: ");
+    //         String o = in.next();
+    //         switch (o.toLowerCase()) {
+    //             case "retain": {
+    //                 appendOp(op, new OTRetain(in.nextInt()));
+    //                 break;
+    //             }                    
+    //             case "insert": {
+    //                 appendOp(op, new OTInsert(in.next()));
+    //                 break;
+    //             }
+    //             case "delete": {
+    //                 appendOp(op, new OTDelete(in.nextInt()));
+    //                 break;
+    //             } 
+    //             default: {
+    //                 loop = false;
+    //             }
+    //         }
+    //     }
 
-        return op.toArray(new OTOperation[op.size()]);
-    }
+    //     return op.toArray(new OTOperation[op.size()]);
+    // }
 
-    final static boolean __TEST_APPLY__ = false, __TEST_TRANSFORM__ = true, __TEST_COMPOSE__ = false;
+    // final static boolean __TEST_APPLY__ = false, __TEST_TRANSFORM__ = true, __TEST_COMPOSE__ = false;
 
-    public static void main(String[] args) {
+    // public static void main(String[] args) {
         
-        Scanner in = new Scanner(System.in);
+    //     Scanner in = new Scanner(System.in);
         
-        if (__TEST_APPLY__) {
-            String base;
-            OTOperation[] op;
+    //     if (__TEST_APPLY__) {
+    //         String base;
+    //         OTOperation[] op;
 
-            System.out.println("========================================");
-            System.out.println("Testing apply...");
+    //         System.out.println("========================================");
+    //         System.out.println("Testing apply...");
 
-            System.out.println("----------------------------------------");
-            System.out.println("Please enter the base string:");
-            base = in.nextLine();
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Please enter the base string:");
+    //         base = in.nextLine();
 
-            System.out.println("----------------------------------------");
-            System.out.println("Reading a sequence of operations...");
-            op = readOp(in);
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Reading a sequence of operations...");
+    //         op = readOp(in);
 
-            try {
-                System.out.println("----------------------------------------");
-                System.out.println("The result of applying op:");
-                System.out.println(apply(base, op));
-            } catch (OTException e) {
-                System.out.println("In method apply: " + e.getMessage());
-            }
-        }
+    //         try {
+    //             System.out.println("----------------------------------------");
+    //             System.out.println("The result of applying op:");
+    //             System.out.println(apply(base, op));
+    //         } catch (OTException e) {
+    //             System.out.println("In method apply: " + e.getMessage());
+    //         }
+    //     }
 
-        if (__TEST_TRANSFORM__) {
-            OTOperation[] op1, op2, op1t, op2t;
-            String base;
+    //     if (__TEST_TRANSFORM__) {
+    //         OTOperation[] op1, op2, op1t, op2t;
+    //         String base;
 
-            System.out.println("========================================");
-            System.out.println("Testing transform...");
+    //         System.out.println("========================================");
+    //         System.out.println("Testing transform...");
 
-            System.out.println("----------------------------------------");
-            System.out.println("Please enter the base string:");
-            base = in.nextLine();
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Please enter the base string:");
+    //         base = in.nextLine();
 
-            System.out.println("----------------------------------------");
-            System.out.println("Reading the first sequence of operations...");
-            op1 = readOp(in);
-            System.out.println("----------------------------------------");
-            System.out.println("Reading the second sequence of operations...");
-            op2 = readOp(in);
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Reading the first sequence of operations...");
+    //         op1 = readOp(in);
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Reading the second sequence of operations...");
+    //         op2 = readOp(in);
 
-            try {
-                OTOperation[][] tmp = transform(op1, op2);
-                op1t = tmp[0];
-                op2t = tmp[1];
-            } catch (OTException e) {
-                System.out.println("In method transform: " + e.getMessage());
-                return;
-            }
-            System.out.println("----------------------------------------");
-            System.out.println("Transform of the first sequence:");
-            for (OTOperation o1: op1t) {
-                System.out.println(o1.toString());
-            }
-            System.out.println("----------------------------------------");
-            System.out.println("Transform of the second sequence:");
-            for (OTOperation o2: op2t) {
-                System.out.println(o2.toString());
-            }
+    //         try {
+    //             OTOperation[][] tmp = transform(op1, op2);
+    //             op1t = tmp[0];
+    //             op2t = tmp[1];
+    //         } catch (OTException e) {
+    //             System.out.println("In method transform: " + e.getMessage());
+    //             return;
+    //         }
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Transform of the first sequence:");
+    //         for (OTOperation o1: op1t) {
+    //             System.out.println(o1.toString());
+    //         }
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Transform of the second sequence:");
+    //         for (OTOperation o2: op2t) {
+    //             System.out.println(o2.toString());
+    //         }
 
-            try {
-                System.out.println("----------------------------------------");
-                System.out.println("The result of applying op1 and transform of op2:");
-                System.out.println(apply(apply(base, op1), op2t));
-            } catch (OTException e) {
-                System.out.println("In method apply: " + e.getMessage());
-            }
-            try {
-                System.out.println("----------------------------------------");
-                System.out.println("The result of applying op2 and transform of op1:");
-                System.out.println(apply(apply(base, op2), op1t));
-            } catch (OTException e) {
-                System.out.println("In method apply: " + e.getMessage());
-            }
-        }
+    //         try {
+    //             System.out.println("----------------------------------------");
+    //             System.out.println("The result of applying op1 and transform of op2:");
+    //             System.out.println(apply(apply(base, op1), op2t));
+    //         } catch (OTException e) {
+    //             System.out.println("In method apply: " + e.getMessage());
+    //         }
+    //         try {
+    //             System.out.println("----------------------------------------");
+    //             System.out.println("The result of applying op2 and transform of op1:");
+    //             System.out.println(apply(apply(base, op2), op1t));
+    //         } catch (OTException e) {
+    //             System.out.println("In method apply: " + e.getMessage());
+    //         }
+    //     }
 
-        if (__TEST_COMPOSE__) {
-            OTOperation[] op1, op2, op;
-            String base;
+    //     if (__TEST_COMPOSE__) {
+    //         OTOperation[] op1, op2, op;
+    //         String base;
 
-            System.out.println("========================================");
-            System.out.println("Testing compose...");
+    //         System.out.println("========================================");
+    //         System.out.println("Testing compose...");
 
-            System.out.println("----------------------------------------");
-            System.out.println("Please enter the base string:");
-            base = in.nextLine();
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Please enter the base string:");
+    //         base = in.nextLine();
 
-            System.out.println("----------------------------------------");
-            System.out.println("Reading the first sequence of operations...");
-            op1 = readOp(in);
-            System.out.println("----------------------------------------");
-            System.out.println("Reading the second sequence of operations...");
-            op2 = readOp(in);
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Reading the first sequence of operations...");
+    //         op1 = readOp(in);
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Reading the second sequence of operations...");
+    //         op2 = readOp(in);
 
-            try {
-                op = compose(op1, op2);
-            } catch (OTException e) {
-                System.out.println("In method compose: " + e.getMessage());
-                return;
-            }
-            System.out.println("----------------------------------------");
-            System.out.println("Compose of the two sequences:");
-            for (OTOperation o: op) {
-                System.out.println(o.toString());
-            }
+    //         try {
+    //             op = compose(op1, op2);
+    //         } catch (OTException e) {
+    //             System.out.println("In method compose: " + e.getMessage());
+    //             return;
+    //         }
+    //         System.out.println("----------------------------------------");
+    //         System.out.println("Compose of the two sequences:");
+    //         for (OTOperation o: op) {
+    //             System.out.println(o.toString());
+    //         }
 
-            try {
-                System.out.println("----------------------------------------");
-                System.out.println("The result of applying op1 and op2:");
-                System.out.println(apply(apply(base, op1), op2));
-            } catch (OTException e) {
-                System.out.println("In method apply: " + e.getMessage());
-            }
-            try {
-                System.out.println("----------------------------------------");
-                System.out.println("The result of applying the compose of op1 and op2:");
-                System.out.println(apply(base, op));
-            } catch (OTException e) {
-                System.out.println("In method apply: " + e.getMessage());
-            }
-        }
-    }
+    //         try {
+    //             System.out.println("----------------------------------------");
+    //             System.out.println("The result of applying op1 and op2:");
+    //             System.out.println(apply(apply(base, op1), op2));
+    //         } catch (OTException e) {
+    //             System.out.println("In method apply: " + e.getMessage());
+    //         }
+    //         try {
+    //             System.out.println("----------------------------------------");
+    //             System.out.println("The result of applying the compose of op1 and op2:");
+    //             System.out.println(apply(base, op));
+    //         } catch (OTException e) {
+    //             System.out.println("In method apply: " + e.getMessage());
+    //         }
+    //     }
+    // }
 }

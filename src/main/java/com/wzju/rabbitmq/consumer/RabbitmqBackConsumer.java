@@ -15,7 +15,14 @@ import javax.annotation.PreDestroy;
 
 public class RabbitmqBackConsumer {
     Channel channel = null;
-    static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+    static Connection connection;
+    static {
+        try {
+            connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public final String filename;
     public final String usrname;
     public String queueName;

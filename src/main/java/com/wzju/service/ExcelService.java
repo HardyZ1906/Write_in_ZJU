@@ -107,6 +107,8 @@ public class ExcelService {
 
     public void createExcelFile(String path) throws IOException {
         System.out.println("createExcelFile: " + path);
+        File file = new File(path);
+        file.createNewFile();
         FileOutputStream fos = new FileOutputStream(path);
         XSSFWorkbook xwb = new XSSFWorkbook();
         xwb.write(fos); xwb.close(); fos.close();

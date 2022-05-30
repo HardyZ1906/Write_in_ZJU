@@ -12,50 +12,56 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 public class RabbitmqConsumer {
-        public final String qname;
-        Channel channel = null;
-        static Connection connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
-        public List<String> buff;
+	public final String qname;
+	Channel channel = null;
+	static Connection connection;
+	static {
+		try {
+			connection = ConnectionUtil.getConnection("10.214.241.124", 5672, "/", "guest", "guest");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public List<String> buff;
 
-        public RabbitmqConsumer(String qname) {
-                this.qname = qname;
-        }
+	public RabbitmqConsumer(String qname) {
+		this.qname = qname;
+	}
 
-        @PostConstruct
-        void init() throws Exception {
-                channel = connection.createChannel();
-                channel.queueDeclare(qname, true, false, true, null);
-                buff = new ArrayList<String>();
+	@PostConstruct
+	void init() throws Exception {
+		channel = connection.createChannel();
+		channel.queueDeclare(qname, true, false, true, null);
+		buff = new ArrayList<String>();
 
-        }
+	}
 
-        @PreDestroy
-        void uninit() throws IOException, TimeoutException {
-                connection.close();
-                channel.close();
-        }
+	@PreDestroy
+	void uninit() throws IOException, TimeoutException {
+		connection.close();
+		channel.close();
+	}
 
-        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                String message = new String(delivery.getBody(), "UTF-8");
+	DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+		String message = new String(delivery.getBody(), "UTF-8");
 
-                System.out.println(" [x] Received ");
-                try {
-                        this.buff.add(message);
-                } finally {
-                        System.out.println(" [x] Done");
-                        channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                }
-        };
-        CancelCallback cancel = new CancelCallback() {
-                @Override
-                public void handle(String consumerTag) throws IOException {
-                        System.out.println("Something wrong");
-                }
-        };
+		System.out.println(" [x] Received ");
+		try {
+			this.buff.add(message);
+		} finally {
+			System.out.println(" [x] Done");
+			channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+		}
+	};
+	CancelCallback cancel = new CancelCallback() {
+		@Override
+		public void handle(String consumerTag) throws IOException {
+			System.out.println("Something wrong");
+		}
+	};
 
-        public void ConsumeData() throws IOException {
-                channel.basicConsume(qname, false, deliverCallback, (consumerTag) -> {
-                });
-        }
+	public void ConsumeData() throws IOException {
+		channel.basicConsume(qname, false, deliverCallback, (consumerTag) -> {});
+	}
 
 }
